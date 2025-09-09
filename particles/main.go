@@ -5,7 +5,6 @@ import (
 
 	ebimath "github.com/edwinsyarief/ebi-math"
 	"github.com/edwinsyarief/katsu2d"
-	"github.com/hajimehoshi/ebiten/v2"
 )
 
 // Game implements ebiten.Game interface.
@@ -43,18 +42,6 @@ func NewGame() *Game {
 	g.engine.AddBackgroundDrawSystem(katsu2d.NewParticleRenderSystem(tm))
 
 	return g
-}
-
-func (self *Game) Update() error {
-	return self.engine.Update()
-}
-
-func (self *Game) Draw(screen *ebiten.Image) {
-	self.engine.Draw(screen)
-}
-
-func (self *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return self.engine.Layout(outsideWidth, outsideHeight)
 }
 
 func main() {

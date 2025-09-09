@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"image/color"
 	"log"
 
@@ -18,10 +17,10 @@ const (
 )
 
 var keybindings = map[katsu2d.Action][]katsu2d.KeyConfig{
-	ActionMoveUp:    {{Key: ebiten.KeyW}, {Key: ebiten.KeyUp}},
-	ActionMoveDown:  {{Key: ebiten.KeyS}, {Key: ebiten.KeyDown}},
-	ActionMoveLeft:  {{Key: ebiten.KeyA}, {Key: ebiten.KeyLeft}},
-	ActionMoveRight: {{Key: ebiten.KeyD}, {Key: ebiten.KeyRight}},
+	ActionMoveUp:    {{Primary: ebiten.KeyW}, {Primary: ebiten.KeyUp}},
+	ActionMoveDown:  {{Primary: ebiten.KeyS}, {Primary: ebiten.KeyDown}},
+	ActionMoveLeft:  {{Primary: ebiten.KeyA}, {Primary: ebiten.KeyLeft}},
+	ActionMoveRight: {{Primary: ebiten.KeyD}, {Primary: ebiten.KeyRight}},
 }
 
 const PlayerTag = "player"
@@ -67,7 +66,7 @@ func (self *PlayerSystem) Update(world *katsu2d.World, dt float64) {
 	}
 
 	if !velocity.IsZero() {
-		newPos := transform.Position().Add(velocity.Normalized().MulF(speed * dt))
+		newPos := transform.Position().Add(velocity.Normalize().ScaleF(speed * dt))
 		transform.SetPosition(newPos)
 	}
 }
@@ -156,20 +155,6 @@ func NewGame() *Game {
 	g.engine.AddBackgroundDrawSystem(renderOrderSystem)
 
 	return g
-}
-
-func (self *Game) Update() error {
-	return self.engine.Update()
-}
-
-func (self *Game) Draw(screen *ebiten.Image) {
-	screen.Fill(color.Black)
-	self.engine.Draw(screen)
-	println(fmt.Sprintf("FPS: %v", ebiten.ActualFPS()))
-}
-
-func (self *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return self.engine.Layout(outsideWidth, outsideHeight)
 }
 
 func main() {
