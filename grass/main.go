@@ -38,8 +38,8 @@ func NewGame() *Game {
 	grassController := katsu2d.NewGrassControllerComponent(world, tm,
 		640, 480, texId, transform.Z,
 		katsu2d.WithGrassDensity(5),
-		katsu2d.WithGrassNoiseMapSize(512),
-		katsu2d.WithGrassNoiseFrequency(30),
+		katsu2d.WithGrassNoiseMapSize(128),
+		katsu2d.WithGrassNoiseFrequency(10),
 		katsu2d.WithGrassWindDirection(1, 0),
 		katsu2d.WithGrassAreas([]katsu2d.Area{
 			{X1: 1, Y1: 1, X2: 10, Y2: 10},
@@ -52,18 +52,6 @@ func NewGame() *Game {
 	g.engine.AddBackgroundDrawSystem(katsu2d.NewSpriteRenderSystem(world, tm))
 
 	return g
-}
-
-func (self *Game) Update() error {
-	return self.engine.Update()
-}
-
-func (self *Game) Draw(screen *ebiten.Image) {
-	self.engine.Draw(screen)
-}
-
-func (self *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return self.engine.Layout(outsideWidth, outsideHeight)
 }
 
 func main() {

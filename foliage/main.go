@@ -33,7 +33,7 @@ func NewGame() *Game {
 	world := g.engine.World()
 
 	// --- Texture Loading ---
-	foliageImage, _, _ := ebitenutil.NewImageFromFile("./examples/foliage/grass.png")
+	foliageImage, _, _ := ebitenutil.NewImageFromFile("./grass.png")
 	g.img = foliageImage
 	foliageTextureID := tm.Add(foliageImage)
 
@@ -44,9 +44,9 @@ func NewGame() *Game {
 	// --- Foliage Controller ---
 	foliageControllerEntity := world.CreateEntity()
 	foliageController := katsu2d.NewFoliageControllerComponent(
-		katsu2d.WithFoliageWindForce(50), // Radians
-		katsu2d.WithFoliageWindSpeed(1.0),
-		katsu2d.WithFoliageRippleStrength(50.0),
+		katsu2d.WithFoliageWindForce(9.5), // Radians
+		katsu2d.WithFoliageWindSpeed(0.75),
+		katsu2d.WithFoliageRippleStrength(5.0),
 	)
 	world.AddComponent(foliageControllerEntity, foliageController)
 
@@ -93,23 +93,10 @@ func createFoliage(world *katsu2d.World, tm *katsu2d.TextureManager, textureID i
 	// Foliage
 	foliage := &katsu2d.FoliageComponent{
 		TextureID: textureID,
-		SwaySeed:  rand.FloatRange(0, 100),
+		SwaySeed:  rand.FloatRange(float64(rand.IntRange(0, 5)), float64(rand.IntRange(50, 100))),
 		Pivot:     pivot,
 	}
 	world.AddComponent(entity, foliage)
-}
-
-func (self *Game) Update() error {
-	return self.engine.Update()
-}
-
-func (self *Game) Draw(screen *ebiten.Image) {
-	self.engine.Draw(screen)
-	screen.DrawImage(self.img, nil)
-}
-
-func (self *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
-	return self.engine.Layout(outsideWidth, outsideHeight)
 }
 
 func main() {
