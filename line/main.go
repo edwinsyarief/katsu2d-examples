@@ -13,8 +13,8 @@ import (
 )
 
 type LineSystem struct {
-	line   *line.Line
-	closed bool
+	line          *line.Line
+	debug, closed bool
 }
 
 func (self *LineSystem) Update(world *katsu2d.World, dt float64) {
@@ -32,6 +32,11 @@ func (self *LineSystem) Update(world *katsu2d.World, dt float64) {
 	if inpututil.IsKeyJustPressed(ebiten.KeyR) {
 		self.line.Reset()
 	}
+
+	if inpututil.IsKeyJustPressed(ebiten.KeyD) {
+		self.debug = !self.debug
+		self.line.SetDebugDraw(self.debug)
+	}
 }
 
 func (self *LineSystem) Draw(world *katsu2d.World, renderer *katsu2d.BatchRenderer) {
@@ -39,7 +44,8 @@ func (self *LineSystem) Draw(world *katsu2d.World, renderer *katsu2d.BatchRender
 
 	self.line.Draw(screen, nil)
 
-	ebitenutil.DebugPrintAt(screen, "Click anywhere to add point to draw line\nPress [Space] to toggle closed line\nPress [R] to reset", 10, 10)
+	ebitenutil.DebugPrintAt(screen,
+		"Click anywhere to add point to draw line\nPress [Space] to toggle closed line\nPress [R] to reset\nPress [D] to toggle debug draw", 10, 10)
 }
 
 // Game implements ebiten.Game interface.
@@ -57,7 +63,6 @@ func NewGame() *Game {
 	)
 
 	l := line.NewLine()
-	l.SetDebugDraw(true)
 	l.SetWidth(20)
 	l.SetJointMode(line.LineJointRound)
 	g.engine.AddOverlayDrawSystem(&LineSystem{
