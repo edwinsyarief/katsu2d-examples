@@ -2,7 +2,7 @@ module github.com/katsu2d/examples/layers
 
 go 1.25.1
 
-require github.com/edwinsyarief/katsu2d v0.5.5
+require github.com/edwinsyarief/katsu2d v0.5.6
 
 require (
 	github.com/aquilax/go-perlin v1.1.0 // indirect

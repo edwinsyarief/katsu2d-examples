@@ -4,7 +4,7 @@ go 1.25.1
 
 require (
 	github.com/edwinsyarief/ebi-math v1.2.3
-	github.com/edwinsyarief/katsu2d v0.5.5
+	github.com/edwinsyarief/katsu2d v0.5.6
 )
 
 require (

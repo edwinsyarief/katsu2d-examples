@@ -3,7 +3,7 @@ module github.com/katsu2d/examples/grass
 go 1.25.1
 
 require (
-	github.com/edwinsyarief/katsu2d v0.5.5
+	github.com/edwinsyarief/katsu2d v0.5.6
 	github.com/hajimehoshi/ebiten/v2 v2.8.8
 )
 
