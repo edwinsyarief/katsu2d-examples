@@ -27,6 +27,7 @@ func NewGame() *Game {
 	g.engine = katsu2d.NewEngine(
 		katsu2d.WithWindowSize(640, 480),
 		katsu2d.WithWindowTitle("Foliage Example"),
+		katsu2d.WithVsyncEnabled(true),
 	)
 
 	tm := g.engine.TextureManager()
@@ -44,14 +45,16 @@ func NewGame() *Game {
 	// --- Foliage Controller ---
 	foliageControllerEntity := world.CreateEntity()
 	foliageController := katsu2d.NewFoliageControllerComponent(
-		katsu2d.WithFoliageWindForce(9.5), // Radians
-		katsu2d.WithFoliageWindSpeed(0.75),
-		katsu2d.WithFoliageRippleStrength(5.0),
+		katsu2d.WithFoliageWindForce(200), // Radians
+		katsu2d.WithFoliageWindSpeed(3.95),
+		katsu2d.WithFoliageRippleStrength(50),
 	)
 	world.AddComponent(foliageControllerEntity, foliageController)
 
+	createFoliage(world, tm, foliageTextureID, 40, 120, ebimath.V(0.5, 1.0))
+
 	// --- Foliage Entities ---
-	for i := 0; i < 10; i++ {
+	/* for i := 0; i < 10; i++ {
 		createFoliage(world, tm, foliageTextureID, float64(i*60), 120, ebimath.V(0.5, 1.0))
 	}
 	for i := 0; i < 10; i++ {
@@ -68,7 +71,7 @@ func NewGame() *Game {
 	}
 	for i := 0; i < 10; i++ {
 		createFoliage(world, tm, foliageTextureID, float64(i*60), 220, ebimath.V(0.5, 1.0))
-	}
+	} */
 
 	return g
 }
@@ -79,21 +82,20 @@ func createFoliage(world *katsu2d.World, tm *katsu2d.TextureManager, textureID i
 	// Transform
 	transform := katsu2d.NewTransformComponent()
 	transform.SetPosition(ebimath.V(x, y))
-	transform.SetOffset(ebimath.V(20, 0))
 	world.AddComponent(entity, transform)
 
 	// Sprite with a grid mesh
 	img := tm.Get(textureID)
 	sprite := katsu2d.NewSpriteComponent(textureID, img.Bounds())
-	sprite.DstW = 128
-	sprite.DstH = 128
+	sprite.DstW = 512
+	sprite.DstH = 512
 	sprite.SetGrid(5, 5) // 1 column, 10 rows
 	world.AddComponent(entity, sprite)
 
 	// Foliage
 	foliage := &katsu2d.FoliageComponent{
 		TextureID: textureID,
-		SwaySeed:  rand.FloatRange(float64(rand.IntRange(0, 5)), float64(rand.IntRange(50, 100))),
+		SwaySeed:  rand.FloatRange(0, 100),
 		Pivot:     pivot,
 	}
 	world.AddComponent(entity, foliage)
