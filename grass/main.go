@@ -4,9 +4,43 @@ import (
 	"image/color"
 	"log"
 
+	ebimath "github.com/edwinsyarief/ebi-math"
 	"github.com/edwinsyarief/katsu2d"
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
+
+type GrassSystem struct{}
+
+func (self *GrassSystem) Update(world *katsu2d.World, dt float64) {
+	entities := world.Query(katsu2d.CTGrassController)
+	if len(entities) == 0 {
+		return
+	}
+
+	grassCtrlAny, _ := world.GetComponent(entities[0], katsu2d.CTGrassController)
+	grassCtrl := grassCtrlAny.(*katsu2d.GrassControllerComponent)
+
+	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
+		grassCtrl.AddStrongWindGust(katsu2d.StrongWindGust{
+			Width:           200,
+			StartPos:        ebimath.V(-100, 0),
+			EndPos:          ebimath.V2(500),
+			Strength:        500,
+			Length:          200,
+			Duration:        3.5,
+			FadeInDuration:  .25,
+			FadeOutDuration: .75,
+		})
+	}
+
+	x, y := ebiten.CursorPosition()
+	grassCtrl.SetForcePositions(katsu2d.ForceSource{
+		Radius:   100,
+		Position: ebimath.V(float64(x), float64(y)),
+		Strength: 500,
+	})
+}
 
 // Game implements ebiten.Game interface.
 type Game struct {
@@ -37,19 +71,21 @@ func NewGame() *Game {
 	transform := katsu2d.NewTransformComponent()
 	grassController := katsu2d.NewGrassControllerComponent(world, tm,
 		640, 480, texId, transform.Z,
+		katsu2d.WithGrassOrderable(true),
 		katsu2d.WithGrassDensity(5),
-		katsu2d.WithGrassNoiseMapSize(128),
-		katsu2d.WithGrassNoiseFrequency(10),
 		katsu2d.WithGrassWindDirection(1, 0),
+		katsu2d.WithGrassWindForce(0.5),
+		katsu2d.WithGrassWindSpeed(5),
 		katsu2d.WithGrassAreas([]katsu2d.Area{
-			{X1: 1, Y1: 1, X2: 10, Y2: 10},
+			{X1: 0, Y1: 0, X2: 20, Y2: 20},
 		}),
 	)
 	entity := world.CreateEntity()
 	world.AddComponent(entity, grassController)
 
 	// 1. TileMapRenderSystem draws the background (lower grid).
-	g.engine.AddBackgroundDrawSystem(katsu2d.NewSpriteRenderSystem(world, tm))
+	g.engine.AddBackgroundDrawSystem(katsu2d.NewOrderableSystem(world, tm))
+	g.engine.AddUpdateSystem(&GrassSystem{})
 
 	return g
 }
