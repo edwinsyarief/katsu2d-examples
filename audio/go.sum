@@ -1,5 +1,3 @@
-github.com/aquilax/go-perlin v1.1.0 h1:Gg+3jQ24wT4Y5GI7TCRLmYarzUG0k+n/JATFqOimb7s=
-github.com/aquilax/go-perlin v1.1.0/go.mod h1:z9Rl7EM4BZY0Ikp2fEN1I5mKSOJ26HQpk0O2TBdN2HE=
 github.com/ebitengine/gomobile v0.0.0-20250329061421-6d0a8e981e4c h1:Ccgks2VROTr6bIm1FFxG2jT6P1DaCBMj8g/O9xbOQ08=
 github.com/ebitengine/gomobile v0.0.0-20250329061421-6d0a8e981e4c/go.mod h1:M6DDA2RbegvWBVv4Dq482lwyFTtMczT1A7UNm1qOYzY=
 github.com/ebitengine/hideconsole v1.0.0 h1:5J4U0kXF+pv/DhiXt5/lTz0eO5ogJ1iXb8Yj1yReDqE=
@@ -12,8 +10,7 @@ github.com/edwinsyarief/assetpacker v1.0.0 h1:V4z0MZRfDQGRafo4jvXyGsYKfUw61B7bRC
 github.com/edwinsyarief/assetpacker v1.0.0/go.mod h1:Cv5V5pP0S33109CQJkip4fHCVDJVi44o4kVsHEGzeEw=
 github.com/edwinsyarief/ebi-math v1.2.3 h1:pVAzk32EygvpHqpRXSRplL6JtJVXspaMNvcuKtB5dA0=
 github.com/edwinsyarief/ebi-math v1.2.3/go.mod h1:lbp0G39FFDw6Ip24UtFpykJtRnUFuyC3HelaoYZkuOU=
-github.com/edwinsyarief/katsu2d v0.5.7 h1:sI6IdgHX2LLuXW5TilSBlN+OqHi9J+MTOrrFjgE61cc=
-github.com/edwinsyarief/katsu2d v0.5.7/go.mod h1:2h7hny8A70L00wXMzi8C4i4wNT2CQKuaHk59vSxGhPc=
+github.com/edwinsyarief/katsu2d v0.6.0 h1:C2GOt+lk9aH7zCD4zQtOEgAXqdtPo9kmf1T5ND9YxrQ=
 github.com/go-text/typesetting v0.3.0 h1:OWCgYpp8njoxSRpwrdd1bQOxdjOXDj9Rqart9ML4iF4=
 github.com/go-text/typesetting v0.3.0/go.mod h1:qjZLkhRgOEYMhU9eHBr3AR4sfnGJvOXNLt8yRAySFuY=
 github.com/go-text/typesetting-utils v0.0.0-20241103174707-87a29e9e6066 h1:qCuYC+94v2xrb1PoS4NIDe7DGYtLnU2wWiQe9a1B1c0=

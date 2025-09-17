@@ -2,10 +2,9 @@ module github.com/katsu2d/examples/layers
 
 go 1.25.1
 
-require github.com/edwinsyarief/katsu2d v0.5.6
+require github.com/edwinsyarief/katsu2d v0.6.0
 
 require (
-	github.com/aquilax/go-perlin v1.1.0 // indirect
 	github.com/ebitengine/gomobile v0.0.0-20250329061421-6d0a8e981e4c // indirect
 	github.com/ebitengine/hideconsole v1.0.0 // indirect
 	github.com/ebitengine/oto/v3 v3.3.3 // indirect
