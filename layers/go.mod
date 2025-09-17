@@ -2,7 +2,7 @@ module github.com/katsu2d/examples/layers
 
 go 1.25.1
 
-require github.com/edwinsyarief/katsu2d v0.6.0
+require github.com/edwinsyarief/katsu2d v0.6.1
 
 require (
 	github.com/ebitengine/gomobile v0.0.0-20250329061421-6d0a8e981e4c // indirect
