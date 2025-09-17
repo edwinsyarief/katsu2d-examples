@@ -6,14 +6,12 @@ import (
 
 	ebimath "github.com/edwinsyarief/ebi-math"
 	"github.com/edwinsyarief/katsu2d"
-	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
 // Game implements ebiten.Game interface.
 type Game struct {
 	engine *katsu2d.Engine
-	img    *ebiten.Image
 }
 
 var rand *ebimath.Rand
@@ -35,7 +33,6 @@ func NewGame() *Game {
 
 	// --- Texture Loading ---
 	foliageImage, _, _ := ebitenutil.NewImageFromFile("./grass.png")
-	g.img = foliageImage
 	foliageTextureID := tm.Add(foliageImage)
 
 	// --- System Setup ---
