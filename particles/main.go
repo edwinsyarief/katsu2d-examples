@@ -136,9 +136,10 @@ func NewGame() *Game {
 	firePreset.Gravity = ebimath.V(0, -150)
 	world.AddComponent(playerEntity, firePreset)
 
-	renderer := katsu2d.NewLayerRendererSystem(
+	renderer := katsu2d.NewLayerSystem(
+		world,
 		WindowWidth/2, WindowHeight/2,
-		katsu2d.AddDrawSystem(katsu2d.NewParticleRenderSystem(tm)))
+		katsu2d.AddSystem(katsu2d.NewParticleRenderSystem(tm)))
 
 	// --- System Setup ---
 	g.engine.AddUpdateSystem(&MainSystem{})

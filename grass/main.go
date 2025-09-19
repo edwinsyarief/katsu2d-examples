@@ -78,6 +78,7 @@ func NewGame() *Game {
 		katsu2d.WithWindowSize(640, 480),
 		katsu2d.WithWindowTitle("Grass Example"),
 		katsu2d.WithUpdateSystem(katsu2d.NewGrassControllerSystem()),
+		katsu2d.WithWindowResizeMode(ebiten.WindowResizingModeEnabled),
 	)
 
 	tm := g.engine.TextureManager()
@@ -104,8 +105,11 @@ func NewGame() *Game {
 	entity := world.CreateEntity()
 	world.AddComponent(entity, grassController)
 
-	// 1. TileMapRenderSystem draws the background (lower grid).
-	g.engine.AddBackgroundDrawSystem(katsu2d.NewOrderableSystem(world, tm))
+	ls := katsu2d.NewLayerSystem(world, 640, 480,
+		katsu2d.AddSystem(katsu2d.NewOrderableSystem(world, tm)),
+	)
+
+	g.engine.AddBackgroundDrawSystem(ls)
 	g.engine.AddOverlayDrawSystem(&GrassSystem{})
 
 	return g
