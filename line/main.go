@@ -42,7 +42,9 @@ func (self *LineSystem) Update(world *katsu2d.World, dt float64) {
 func (self *LineSystem) Draw(world *katsu2d.World, renderer *katsu2d.BatchRenderer) {
 	screen := renderer.GetScreen()
 
-	self.line.Draw(screen, nil)
+	op := ebiten.DrawTrianglesOptions{}
+	op.AntiAlias = true
+	self.line.Draw(screen, &op)
 
 	ebitenutil.DebugPrintAt(screen,
 		"Click anywhere to add point to draw line\nPress [Space] to toggle closed line\nPress [R] to reset\nPress [D] to toggle debug draw", 10, 10)

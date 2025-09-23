@@ -4,7 +4,7 @@ go 1.25.1
 
 require (
 	github.com/edwinsyarief/ebi-math v1.2.4
-	github.com/edwinsyarief/katsu2d v0.7.1
+	github.com/edwinsyarief/katsu2d v0.8.0
 	github.com/hajimehoshi/ebiten/v2 v2.8.8
 )
 
@@ -12,7 +12,7 @@ require (
 	github.com/ebitengine/gomobile v0.0.0-20250329061421-6d0a8e981e4c // indirect
 	github.com/ebitengine/hideconsole v1.0.0 // indirect
 	github.com/ebitengine/oto/v3 v3.3.3 // indirect
-	github.com/ebitengine/purego v0.8.4 // indirect
+	github.com/ebitengine/purego v0.9.0 // indirect
 	github.com/edwinsyarief/assetpacker v1.0.0 // indirect
 	github.com/go-text/typesetting v0.3.0 // indirect
 	github.com/hajimehoshi/go-mp3 v0.3.4 // indirect
