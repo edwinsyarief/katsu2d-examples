@@ -32,7 +32,7 @@ func NewGame() *Game {
 	t.SetOffset(ebimath.V2(100))
 	world.AddComponent(entity, t)
 
-	r := katsu2d.NewRectangleComponent(200, 200, color.RGBA{255, 255, 0, 255})
+	r := katsu2d.NewRectangleShape(200, 200, color.RGBA{255, 255, 0, 255})
 	r.SetCornerRadius(20, 0, 0, 20)
 	r.SetStroke(20, color.RGBA{255, 0, 0, 255})
 	r.SetColor(
@@ -47,14 +47,14 @@ func NewGame() *Game {
 		color.RGBA{255, 0, 0, 255},
 		color.RGBA{255, 0, 0, 255},
 	)
-	world.AddComponent(entity, r)
+	world.AddComponent(entity, katsu2d.NewShapeComponent(r))
 
 	entity2 := world.CreateEntity()
 	t2 := katsu2d.NewTransformComponent()
 	t2.SetPosition(ebimath.V(300, 300))
 	world.AddComponent(entity2, t2)
 
-	circle := katsu2d.NewCircleComponent(50, color.RGBA{255, 255, 0, 255})
+	circle := katsu2d.NewCircleShape(50, color.RGBA{255, 255, 0, 255})
 	circle.SetStroke(20, color.RGBA{255, 0, 0, 255})
 	circle.SetColor(
 		color.RGBA{255, 0, 0, 255},
@@ -68,14 +68,14 @@ func NewGame() *Game {
 		color.RGBA{255, 0, 0, 255},
 		color.RGBA{255, 0, 0, 255},
 	)
-	world.AddComponent(entity2, circle)
+	world.AddComponent(entity2, katsu2d.NewShapeComponent(circle))
 
 	entity3 := world.CreateEntity()
 	t3 := katsu2d.NewTransformComponent()
 	t3.SetPosition(ebimath.V(500, 50))
 	world.AddComponent(entity3, t3)
 
-	hexagon := katsu2d.NewHexagonComponent(100, color.RGBA{255, 255, 0, 255})
+	hexagon := katsu2d.NewHexagonShape(100, color.RGBA{255, 255, 0, 255})
 	hexagon.SetCornerRadius(10)
 	hexagon.SetStroke(20, color.RGBA{255, 0, 0, 255})
 	hexagon.SetColor(
@@ -90,14 +90,14 @@ func NewGame() *Game {
 		color.RGBA{255, 255, 0, 255},
 		color.RGBA{255, 0, 0, 255},
 	)
-	world.AddComponent(entity3, hexagon)
+	world.AddComponent(entity3, katsu2d.NewShapeComponent(hexagon))
 
 	entity4 := world.CreateEntity()
 	t4 := katsu2d.NewTransformComponent()
 	t4.SetPosition(ebimath.V(550, 400))
 	world.AddComponent(entity4, t4)
 
-	triangle := katsu2d.NewTriangleComponent(100, 100, color.RGBA{255, 255, 0, 255})
+	triangle := katsu2d.NewTriangleShape(100, 100, color.RGBA{255, 255, 0, 255})
 	triangle.SetCornerRadius(10)
 	triangle.SetStroke(20, color.RGBA{255, 0, 0, 255})
 	triangle.SetColor(
@@ -110,7 +110,7 @@ func NewGame() *Game {
 		color.RGBA{255, 0, 0, 255},
 		color.RGBA{255, 255, 0, 255},
 	)
-	world.AddComponent(entity4, triangle)
+	world.AddComponent(entity4, katsu2d.NewShapeComponent(triangle))
 
 	g.engine.AddOverlayDrawSystem(katsu2d.NewShapeRenderSystem())
 

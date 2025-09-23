@@ -3,7 +3,7 @@ module github.com/katsu2d/examples/audio
 go 1.25.1
 
 require (
-	github.com/edwinsyarief/katsu2d v0.8.0
+	github.com/edwinsyarief/katsu2d v1.0.0
 	github.com/hajimehoshi/ebiten/v2 v2.8.8
 )
 
