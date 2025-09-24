@@ -10,8 +10,7 @@ github.com/edwinsyarief/assetpacker v1.0.0 h1:V4z0MZRfDQGRafo4jvXyGsYKfUw61B7bRC
 github.com/edwinsyarief/assetpacker v1.0.0/go.mod h1:Cv5V5pP0S33109CQJkip4fHCVDJVi44o4kVsHEGzeEw=
 github.com/edwinsyarief/ebi-math v1.2.4 h1:A09R2gzQw4KI9NylcJxKo/PqY/m5Ic/14YuB8Dn4fTA=
 github.com/edwinsyarief/ebi-math v1.2.4/go.mod h1:lbp0G39FFDw6Ip24UtFpykJtRnUFuyC3HelaoYZkuOU=
-github.com/edwinsyarief/katsu2d v1.0.0 h1:CkM2CFIkXCIrjBuz9T/gjlwReJ0B9D2++mN2jBZ5iPA=
-github.com/edwinsyarief/katsu2d v1.0.0/go.mod h1:SWWQSArpKkzgU/mSMQudDqb/yYzO1nquHizye1ZuiEA=
+github.com/edwinsyarief/katsu2d v1.5.0 h1:DRPNHVDQMICiTPicM9oFsFwn0Q/oppOcw5BYP8gOEsw=
 github.com/edwinsyarief/lazyecs v1.1.0 h1:C4cuVwZYe3o6StcWgqqr9YX6sW9t09AY9+iF9vTxn5Q=
 github.com/edwinsyarief/lazyecs v1.1.0/go.mod h1:nrNMXHwURxJpECwRJSUBpv1U+TseNXJhVl3xzBPglUc=
 github.com/go-text/typesetting v0.3.0 h1:OWCgYpp8njoxSRpwrdd1bQOxdjOXDj9Rqart9ML4iF4=
