@@ -118,7 +118,6 @@ func NewGame() *Game {
 
 		treeSprite, _ := lazyecs.GetComponent[katsu2d.SpriteComponent](world, treeEntity)
 		treeSprite.Init(treeTexID, treeImg.Bounds())
-		treeSprite.GenerateMesh()
 
 		orderable, _ := lazyecs.GetComponent[katsu2d.OrderableComponent](world, treeEntity)
 		orderable.Init(func() float64 {
@@ -138,7 +137,6 @@ func NewGame() *Game {
 
 		treeSprite, _ := lazyecs.GetComponent[katsu2d.SpriteComponent](world, treeEntity)
 		treeSprite.Init(treeTexID, treeImg.Bounds())
-		treeSprite.GenerateMesh()
 
 		orderable, _ := lazyecs.GetComponent[katsu2d.OrderableComponent](world, treeEntity)
 		orderable.Init(func() float64 {
@@ -162,7 +160,6 @@ func NewGame() *Game {
 
 	playerSprite, _ := lazyecs.GetComponent[katsu2d.SpriteComponent](world, playerEntity)
 	playerSprite.Init(playerTexID, playerImg.Bounds())
-	playerSprite.GenerateMesh()
 
 	playerTag, _ := lazyecs.GetComponent[katsu2d.TagComponent](world, playerEntity)
 	playerTag.Init(PlayerTag)
