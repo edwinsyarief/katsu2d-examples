@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/edwinsyarief/katsu2d"
+	"github.com/edwinsyarief/lazyecs"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
@@ -28,23 +29,24 @@ type AudioSystem struct {
 	sfxPlaybackID katsu2d.PlaybackID
 }
 
-func (self *AudioSystem) Update(world *katsu2d.World, dt float64) {
-	for _, e := range world.Query(katsu2d.CTInput) {
-		i, _ := world.GetComponent(e, katsu2d.CTInput)
-		input := i.(*katsu2d.InputComponent)
-
-		if input.IsJustPressed(ActionPlayMusic) {
-			self.playbackID, _ = self.audioManager.FadeSound(self.trackID, 0, 3.75, katsu2d.AudioFadeIn, self.stackConfig)
-		}
-		if input.IsJustPressed(ActionPlaySfx) {
-			self.sfxPlaybackID, _ = self.audioManager.PlaySound(self.sfxID, 0, self.stackConfig)
+func (self *AudioSystem) Update(world *lazyecs.World, dt float64) {
+	query := world.Query(katsu2d.CTInput)
+	for query.Next() {
+		inputs, _ := lazyecs.GetComponentSlice[katsu2d.InputComponent](query)
+		for _, input := range inputs {
+			if input.IsJustPressed(ActionPlayMusic) {
+				self.playbackID, _ = self.audioManager.FadeSound(self.trackID, 0, 3.75, katsu2d.AudioFadeIn, self.stackConfig)
+			}
+			if input.IsJustPressed(ActionPlaySfx) {
+				self.sfxPlaybackID, _ = self.audioManager.PlaySound(self.sfxID, 0, self.stackConfig)
+			}
 		}
 	}
 }
 
 type DebugDrawSystem struct{}
 
-func (self *DebugDrawSystem) Draw(world *katsu2d.World, renderer *katsu2d.BatchRenderer) {
+func (self *DebugDrawSystem) Draw(world *lazyecs.World, renderer *katsu2d.BatchRenderer) {
 	screen := renderer.GetScreen()
 
 	ebitenutil.DebugPrintAt(screen, "Press [Space] to start music\nPress [S] to play sfx", 20, 20)
@@ -83,7 +85,8 @@ func NewGame() *Game {
 	// --- Entity Setup ---
 	// Create an entity that will handle input
 	inputEntity := world.CreateEntity()
-	world.AddComponent(inputEntity, katsu2d.NewInputComponent(keybindings))
+	inputComponent, _ := lazyecs.AddComponent[katsu2d.InputComponent](world, inputEntity)
+	inputComponent.Init(keybindings)
 
 	// --- System Setup ---
 	g.engine.AddUpdateSystem(&AudioSystem{

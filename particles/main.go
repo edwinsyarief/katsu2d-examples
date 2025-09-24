@@ -7,6 +7,7 @@ import (
 
 	ebimath "github.com/edwinsyarief/ebi-math"
 	"github.com/edwinsyarief/katsu2d"
+	"github.com/edwinsyarief/lazyecs"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -24,7 +25,7 @@ type DebugSystem struct {
 	debugImg *ebiten.Image
 }
 
-func (self *DebugSystem) Draw(world *katsu2d.World, renderer *katsu2d.BatchRenderer) {
+func (self *DebugSystem) Draw(world *lazyecs.World, renderer *katsu2d.BatchRenderer) {
 	screen := renderer.GetScreen()
 
 	if self.debugImg == nil {
@@ -45,7 +46,7 @@ type MainSystem struct {
 	prevParticle     int
 }
 
-func (self *MainSystem) Update(world *katsu2d.World, dt float64) {
+func (self *MainSystem) Update(world *lazyecs.World, dt float64) {
 	if inpututil.IsKeyJustPressed(ebiten.KeyE) {
 		self.selectedParticle++
 	}
@@ -60,44 +61,48 @@ func (self *MainSystem) Update(world *katsu2d.World, dt float64) {
 	if self.selectedParticle != self.prevParticle {
 		self.prevParticle = self.selectedParticle
 
-		emitterEntity := world.Query(katsu2d.CTParticleEmitter)[0]
-		world.RemoveComponent(emitterEntity, katsu2d.CTParticleEmitter)
+		query := world.Query(katsu2d.CTParticleEmitter)
+		for query.Next() {
+			for _, entity := range query.Entities() {
+				lazyecs.RemoveComponent[katsu2d.ParticleEmitterComponent](world, entity)
 
-		t, _ := world.GetComponent(emitterEntity, katsu2d.CTTransform)
-		transform := t.(*katsu2d.TransformComponent)
+				transform, _ := lazyecs.GetComponent[katsu2d.TransformComponent](world, entity)
+				newPreset, _ := lazyecs.AddComponent[katsu2d.ParticleEmitterComponent](world, entity)
 
-		switch self.selectedParticle {
-		case 1:
-			rainPreset := katsu2d.RainPreset(0)
-			rainPreset.InitialColorMin = color.RGBA{255, 255, 255, 255}
-			rainPreset.InitialColorMax = color.RGBA{255, 255, 255, 255}
-			rainPreset.TargetColorMin = color.RGBA{255, 255, 255, 0}
-			rainPreset.TargetColorMax = color.RGBA{255, 255, 255, 0}
-			rainPreset.MinScale = 2
-			rainPreset.MaxScale = 3
-			rainPreset.InitialParticleSpeedMin = 0
-			rainPreset.InitialParticleSpeedMax = 0
-			rainPreset.DirectionMode = katsu2d.ParticleDirectionModeLinear
-			rainPreset.Gravity = ebimath.V(0, 900)
-			rainPreset.ParticleSpawnOffset = ebimath.V(320, 0)
-			world.AddComponent(emitterEntity, rainPreset)
-			transform.SetPosition(ebimath.V(0, -10))
-		case 2:
-			whimsicalPreset := katsu2d.WhimsicalPreset(0)
-			whimsicalPreset.MinScale = 5
-			whimsicalPreset.MaxScale = 10
-			world.AddComponent(emitterEntity, whimsicalPreset)
-			transform.SetPosition(ebimath.V(320/2, 180/2))
-		default:
-			// --- Particle Emitter Setup ---
-			firePreset := katsu2d.FirePreset(0)
-			firePreset.MinScale = 10
-			firePreset.MaxScale = 10.5
-			firePreset.ParticleSpawnOffset = ebimath.V2(20)
-			firePreset.ScaleMode = katsu2d.ParticleScaleModeScaleInOut
-			firePreset.Gravity = ebimath.V(0, -150)
-			world.AddComponent(emitterEntity, firePreset)
-			transform.SetPosition(ebimath.V(320/2, 180/2))
+				switch self.selectedParticle {
+				case 1:
+					newPreset.RainPreset(rainTextId)
+
+					newPreset.MaxParticles = 5000
+					newPreset.EmitRate = 2000
+					newPreset.InitialColorMin = color.RGBA{255, 255, 255, 255}
+					newPreset.InitialColorMax = color.RGBA{255, 255, 255, 255}
+					newPreset.TargetColorMin = color.RGBA{255, 255, 255, 0}
+					newPreset.TargetColorMax = color.RGBA{255, 255, 255, 0}
+					newPreset.MinScale = 2
+					newPreset.MaxScale = 3
+					newPreset.InitialParticleSpeedMin = 0
+					newPreset.InitialParticleSpeedMax = 50
+					newPreset.DirectionMode = katsu2d.ParticleDirectionModeLinear
+					newPreset.Gravity = ebimath.V(0, 900)
+					newPreset.ParticleSpawnOffset = ebimath.V(320, 0)
+					transform.SetPosition(ebimath.V(0, -50))
+				case 2:
+					newPreset.WhimsicalPreset(0)
+					newPreset.MinScale = 5
+					newPreset.MaxScale = 10
+					transform.SetPosition(ebimath.V(320/2, 180/2))
+				default:
+					// --- Particle Emitter Setup ---
+					newPreset.FirePreset(0)
+					newPreset.MinScale = 10
+					newPreset.MaxScale = 10.5
+					newPreset.ParticleSpawnOffset = ebimath.V2(20)
+					newPreset.ScaleMode = katsu2d.ParticleScaleModeScaleInOut
+					newPreset.Gravity = ebimath.V(0, -150)
+					transform.SetPosition(ebimath.V(320/2, 180/2))
+				}
+			}
 		}
 	}
 }
@@ -106,6 +111,8 @@ func (self *MainSystem) Update(world *katsu2d.World, dt float64) {
 type Game struct {
 	engine *katsu2d.Engine
 }
+
+var rainTextId = 0
 
 // NewGame creates a new Game object and sets up the engine.
 func NewGame() *Game {
@@ -120,24 +127,27 @@ func NewGame() *Game {
 	tm := g.engine.TextureManager()
 	world := g.engine.World()
 
+	rainImage := ebiten.NewImage(1, 5)
+	rainImage.Fill(color.White)
+	rainTextId = tm.Add(rainImage)
+
 	// --- Player Entity Setup ---
 	playerEntity := world.CreateEntity()
-	playerTransform := katsu2d.NewTransformComponent()
+	playerTransform, _ := lazyecs.AddComponent[katsu2d.TransformComponent](world, playerEntity)
+	playerTransform.Init()
 	// Start the emitter at the bottom-center of the screen
 	playerTransform.SetPosition(ebimath.V(WindowWidth/4, WindowHeight/4))
-	world.AddComponent(playerEntity, playerTransform)
 
 	// --- Particle Emitter Setup ---
-	firePreset := katsu2d.FirePreset(0)
+	firePreset, _ := lazyecs.AddComponent[katsu2d.ParticleEmitterComponent](world, playerEntity)
+	firePreset.FirePreset(0)
 	firePreset.MinScale = 10
 	firePreset.MaxScale = 10.5
 	firePreset.ParticleSpawnOffset = ebimath.V2(20)
 	firePreset.ScaleMode = katsu2d.ParticleScaleModeScaleInOut
 	firePreset.Gravity = ebimath.V(0, -150)
-	world.AddComponent(playerEntity, firePreset)
 
 	renderer := katsu2d.NewLayerSystem(
-		world,
 		WindowWidth/2, WindowHeight/2,
 		katsu2d.AddSystem(katsu2d.NewParticleRenderSystem(tm)))
 

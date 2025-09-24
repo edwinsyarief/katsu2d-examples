@@ -10,6 +10,7 @@ import (
 	ebimath "github.com/edwinsyarief/ebi-math"
 	"github.com/edwinsyarief/katsu2d"
 	"github.com/edwinsyarief/katsu2d/line"
+	"github.com/edwinsyarief/lazyecs"
 )
 
 type LineSystem struct {
@@ -17,7 +18,7 @@ type LineSystem struct {
 	debug, closed bool
 }
 
-func (self *LineSystem) Update(world *katsu2d.World, dt float64) {
+func (self *LineSystem) Update(world *lazyecs.World, dt float64) {
 	// On left click, add a new point at the cursor position.
 	if inpututil.IsMouseButtonJustPressed(ebiten.MouseButtonLeft) {
 		x, y := ebiten.CursorPosition()
@@ -39,7 +40,7 @@ func (self *LineSystem) Update(world *katsu2d.World, dt float64) {
 	}
 }
 
-func (self *LineSystem) Draw(world *katsu2d.World, renderer *katsu2d.BatchRenderer) {
+func (self *LineSystem) Draw(world *lazyecs.World, renderer *katsu2d.BatchRenderer) {
 	screen := renderer.GetScreen()
 
 	op := ebiten.DrawTrianglesOptions{}

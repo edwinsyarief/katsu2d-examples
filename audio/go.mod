@@ -3,12 +3,13 @@ module github.com/katsu2d/examples/audio
 go 1.25.1
 
 require (
-	github.com/edwinsyarief/katsu2d v1.0.0
+	github.com/edwinsyarief/katsu2d v1.5.0
+	github.com/edwinsyarief/lazyecs v1.1.0
 	github.com/hajimehoshi/ebiten/v2 v2.8.8
 )
 
 require (
-	github.com/ebitengine/gomobile v0.0.0-20250329061421-6d0a8e981e4c // indirect
+	github.com/ebitengine/gomobile v0.0.0-20250923094054-ea854a63cce1 // indirect
 	github.com/ebitengine/hideconsole v1.0.0 // indirect
 	github.com/ebitengine/oto/v3 v3.3.3 // indirect
 	github.com/ebitengine/purego v0.9.0 // indirect
