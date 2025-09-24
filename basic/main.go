@@ -6,6 +6,7 @@ import (
 
 	ebimath "github.com/edwinsyarief/ebi-math"
 	"github.com/edwinsyarief/katsu2d"
+	"github.com/edwinsyarief/lazyecs"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -28,28 +29,28 @@ const PlayerTag = "player"
 // PlayerSystem is a simple system to move the player.
 type PlayerSystem struct{}
 
-func (self *PlayerSystem) Update(world *katsu2d.World, dt float64) {
+func (self *PlayerSystem) Update(world *lazyecs.World, dt float64) {
 	// Find the player entity using its tag.
-	var player katsu2d.Entity
 	found := false
-	for _, e := range world.Query(katsu2d.CTTag, katsu2d.CTTransform, katsu2d.CTInput) {
-		tag, _ := world.GetComponent(e, katsu2d.CTTag)
-		if tag.(*katsu2d.TagComponent).Tag == PlayerTag {
-			player = e
-			found = true
-			break
+	query := world.Query(katsu2d.CTTag)
+	var transform *katsu2d.TransformComponent
+	var input katsu2d.InputComponent
+	for query.Next() {
+		tags, _ := lazyecs.GetComponentSlice[katsu2d.TagComponent](query)
+		inputs, _ := lazyecs.GetComponentSlice[katsu2d.InputComponent](query)
+		for i, entity := range query.Entities() {
+			if tags[i].Tag == PlayerTag {
+				found = true
+				transform, _ = lazyecs.GetComponent[katsu2d.TransformComponent](world, entity)
+				input = inputs[i]
+				break
+			}
 		}
 	}
 
 	if !found {
 		return
 	}
-
-	t, _ := world.GetComponent(player, katsu2d.CTTransform)
-	transform := t.(*katsu2d.TransformComponent)
-
-	i, _ := world.GetComponent(player, katsu2d.CTInput)
-	input := i.(*katsu2d.InputComponent)
 
 	speed := 60.0 // pixels per second
 	var velocity ebimath.Vector
@@ -96,19 +97,27 @@ func NewGame() *Game {
 
 	// --- Player Setup ---
 	playerEntity := world.CreateEntity()
-	playerTransform := katsu2d.NewTransformComponent()
+	playerTransform, _ := lazyecs.AddComponent[katsu2d.TransformComponent](world, playerEntity)
+	playerTransform.Init()
 	playerTransform.SetPosition(ebimath.V(80, 60))
 	playerTransform.Z = 1 // Set player's Z to the same layer as the upper grid tiles
-	world.AddComponent(playerEntity, playerTransform)
-	world.AddComponent(playerEntity, katsu2d.NewSpriteComponent(playerTexID, playerImg.Bounds()))
-	world.AddComponent(playerEntity, katsu2d.NewTagComponent(PlayerTag))
-	world.AddComponent(playerEntity, katsu2d.NewInputComponent(keybindings))
+
+	playerSprite, _ := lazyecs.AddComponent[katsu2d.SpriteComponent](world, playerEntity)
+	playerSprite.Init(
+		playerTexID, playerImg.Bounds(),
+	)
+
+	playerTag, _ := lazyecs.AddComponent[katsu2d.TagComponent](world, playerEntity)
+	playerTag.Init(PlayerTag)
+
+	playerInput, _ := lazyecs.AddComponent[katsu2d.InputComponent](world, playerEntity)
+	playerInput.Init(keybindings)
 
 	// --- System Setup ---
 	// The order of these systems is important for this rendering technique.
 	g.engine.AddUpdateSystem(&PlayerSystem{})
 
-	g.engine.AddBackgroundDrawSystem(katsu2d.NewSpriteRenderSystem(world, tm))
+	g.engine.AddBackgroundDrawSystem(katsu2d.NewSpriteRenderSystem(tm))
 
 	return g
 }

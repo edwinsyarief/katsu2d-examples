@@ -6,6 +6,7 @@ import (
 
 	ebimath "github.com/edwinsyarief/ebi-math"
 	"github.com/edwinsyarief/katsu2d"
+	"github.com/edwinsyarief/lazyecs"
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
@@ -28,15 +29,22 @@ const PlayerTag = "player"
 // PlayerSystem is a simple system to move the player.
 type PlayerSystem struct{}
 
-func (self *PlayerSystem) Update(world *katsu2d.World, dt float64) {
-	var player katsu2d.Entity
+func (self *PlayerSystem) Update(world *lazyecs.World, dt float64) {
+	// Find the player entity using its tag.
 	found := false
-	for _, e := range world.Query(katsu2d.CTTag, katsu2d.CTTransform, katsu2d.CTInput) {
-		tag, _ := world.GetComponent(e, katsu2d.CTTag)
-		if tag.(*katsu2d.TagComponent).Tag == PlayerTag {
-			player = e
-			found = true
-			break
+	query := world.Query(katsu2d.CTTag)
+	var transform *katsu2d.TransformComponent
+	var input katsu2d.InputComponent
+	for query.Next() {
+		tags, _ := lazyecs.GetComponentSlice[katsu2d.TagComponent](query)
+		inputs, _ := lazyecs.GetComponentSlice[katsu2d.InputComponent](query)
+		for i, entity := range query.Entities() {
+			if tags[i].Tag == PlayerTag {
+				found = true
+				transform, _ = lazyecs.GetComponent[katsu2d.TransformComponent](world, entity)
+				input = inputs[i]
+				break
+			}
 		}
 	}
 
@@ -44,13 +52,7 @@ func (self *PlayerSystem) Update(world *katsu2d.World, dt float64) {
 		return
 	}
 
-	t, _ := world.GetComponent(player, katsu2d.CTTransform)
-	transform := t.(*katsu2d.TransformComponent)
-
-	i, _ := world.GetComponent(player, katsu2d.CTInput)
-	input := i.(*katsu2d.InputComponent)
-
-	speed := 60.0
+	speed := 60.0 // pixels per second
 	var velocity ebimath.Vector
 	if input.IsPressed(ActionMoveUp) {
 		velocity.Y = -1
@@ -66,8 +68,7 @@ func (self *PlayerSystem) Update(world *katsu2d.World, dt float64) {
 	}
 
 	if !velocity.IsZero() {
-		newPos := transform.Position().Add(velocity.Normalize().ScaleF(speed * dt))
-		transform.SetPosition(newPos)
+		transform.SetPosition(transform.Position().Add(velocity.Normalize().ScaleF(speed * dt)))
 	}
 }
 
@@ -103,56 +104,87 @@ func NewGame() *Game {
 	particleTexID := tm.Add(particleImg)
 
 	// --- Entities ---
+
 	// Create some trees
-	for i := 0; i < 100; i++ {
+	for i := 0; i < 10; i++ {
 		treeEntity := world.CreateEntity()
-		treeTransform := katsu2d.NewTransformComponent()
+		lazyecs.AddComponent[katsu2d.TransformComponent](world, treeEntity)
+		lazyecs.AddComponent[katsu2d.SpriteComponent](world, treeEntity)
+		lazyecs.AddComponent[katsu2d.OrderableComponent](world, treeEntity)
+
+		treeTransform, _ := lazyecs.GetComponent[katsu2d.TransformComponent](world, treeEntity)
+		treeTransform.Init()
 		treeTransform.SetPosition(ebimath.V(float64(i*40+20), 100))
-		world.AddComponent(treeEntity, treeTransform)
-		treeSprite := katsu2d.NewSpriteComponent(treeTexID, treeImg.Bounds())
-		world.AddComponent(treeEntity, treeSprite)
-		world.AddComponent(treeEntity, katsu2d.NewOrderableComponent(func() float64 {
+
+		treeSprite, _ := lazyecs.GetComponent[katsu2d.SpriteComponent](world, treeEntity)
+		treeSprite.Init(treeTexID, treeImg.Bounds())
+		treeSprite.GenerateMesh()
+
+		orderable, _ := lazyecs.GetComponent[katsu2d.OrderableComponent](world, treeEntity)
+		orderable.Init(func() float64 {
 			return treeTransform.Position().Y + float64(treeSprite.DstH)
-		}))
+		})
 	}
-	for i := 0; i < 100; i++ {
+
+	for i := 0; i < 10; i++ {
 		treeEntity := world.CreateEntity()
-		treeTransform := katsu2d.NewTransformComponent()
-		treeTransform.SetPosition(ebimath.V(float64(i*40+40), 200))
-		world.AddComponent(treeEntity, treeTransform)
-		treeSprite := katsu2d.NewSpriteComponent(treeTexID, treeImg.Bounds())
-		world.AddComponent(treeEntity, treeSprite)
-		world.AddComponent(treeEntity, katsu2d.NewOrderableComponent(func() float64 {
+		lazyecs.AddComponent[katsu2d.TransformComponent](world, treeEntity)
+		lazyecs.AddComponent[katsu2d.SpriteComponent](world, treeEntity)
+		lazyecs.AddComponent[katsu2d.OrderableComponent](world, treeEntity)
+
+		treeTransform, _ := lazyecs.GetComponent[katsu2d.TransformComponent](world, treeEntity)
+		treeTransform.Init()
+		treeTransform.SetPosition(ebimath.V(float64(i*40+20), 200))
+
+		treeSprite, _ := lazyecs.GetComponent[katsu2d.SpriteComponent](world, treeEntity)
+		treeSprite.Init(treeTexID, treeImg.Bounds())
+		treeSprite.GenerateMesh()
+
+		orderable, _ := lazyecs.GetComponent[katsu2d.OrderableComponent](world, treeEntity)
+		orderable.Init(func() float64 {
 			return treeTransform.Position().Y + float64(treeSprite.DstH)
-		}))
+		})
 	}
 
 	// Player
 	playerEntity := world.CreateEntity()
-	playerTransform := katsu2d.NewTransformComponent()
+
+	lazyecs.AddComponent[katsu2d.TransformComponent](world, playerEntity)
+	lazyecs.AddComponent[katsu2d.SpriteComponent](world, playerEntity)
+	lazyecs.AddComponent[katsu2d.TagComponent](world, playerEntity)
+	lazyecs.AddComponent[katsu2d.InputComponent](world, playerEntity)
+	lazyecs.AddComponent[katsu2d.OrderableComponent](world, playerEntity)
+	lazyecs.AddComponent[katsu2d.ParticleEmitterComponent](world, playerEntity)
+
+	playerTransform, _ := lazyecs.GetComponent[katsu2d.TransformComponent](world, playerEntity)
+	playerTransform.Init()
 	playerTransform.SetPosition(ebimath.V(160, 120))
-	world.AddComponent(playerEntity, playerTransform)
-	playerSprite := katsu2d.NewSpriteComponent(playerTexID, playerImg.Bounds())
-	world.AddComponent(playerEntity, playerSprite)
-	world.AddComponent(playerEntity, katsu2d.NewTagComponent(PlayerTag))
-	world.AddComponent(playerEntity, katsu2d.NewInputComponent(keybindings))
-	world.AddComponent(playerEntity, katsu2d.NewOrderableComponent(func() float64 {
+
+	playerSprite, _ := lazyecs.GetComponent[katsu2d.SpriteComponent](world, playerEntity)
+	playerSprite.Init(playerTexID, playerImg.Bounds())
+	playerSprite.GenerateMesh()
+
+	playerTag, _ := lazyecs.GetComponent[katsu2d.TagComponent](world, playerEntity)
+	playerTag.Init(PlayerTag)
+
+	playerInput, _ := lazyecs.GetComponent[katsu2d.InputComponent](world, playerEntity)
+	playerInput.Init(keybindings)
+
+	orderable, _ := lazyecs.GetComponent[katsu2d.OrderableComponent](world, playerEntity)
+	orderable.Init(func() float64 {
 		return playerTransform.Position().Y + float64(playerSprite.DstH)
-	}))
+	})
 
 	// Particle Emitter
-	firePreset := katsu2d.FirePreset(particleTexID)
-	world.AddComponent(playerEntity, firePreset)
+	fireEmitter, _ := lazyecs.GetComponent[katsu2d.ParticleEmitterComponent](world, playerEntity)
+	fireEmitter.FirePreset(particleTexID)
 
 	// --- Systems ---
 	g.engine.AddUpdateSystem(katsu2d.NewInputSystem())
 	g.engine.AddUpdateSystem(&PlayerSystem{})
 	g.engine.AddUpdateSystem(katsu2d.NewParticleEmitterSystem(tm))
 	g.engine.AddUpdateSystem(katsu2d.NewParticleUpdateSystem())
-
-	renderOrderSystem := katsu2d.NewOrderableSystem(world, tm)
-	g.engine.AddUpdateSystem(renderOrderSystem)
-	g.engine.AddBackgroundDrawSystem(renderOrderSystem)
+	g.engine.AddOverlayDrawSystem(katsu2d.NewOrderableSystem(tm))
 
 	return g
 }

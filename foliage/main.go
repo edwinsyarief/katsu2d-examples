@@ -6,6 +6,7 @@ import (
 
 	ebimath "github.com/edwinsyarief/ebi-math"
 	"github.com/edwinsyarief/katsu2d"
+	"github.com/edwinsyarief/lazyecs"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 )
 
@@ -37,65 +38,43 @@ func NewGame() *Game {
 
 	// --- System Setup ---
 	g.engine.AddUpdateSystem(katsu2d.NewFoliageSystem())
-	g.engine.AddBackgroundDrawSystem(katsu2d.NewSpriteRenderSystem(world, tm))
+	g.engine.AddBackgroundDrawSystem(katsu2d.NewSpriteRenderSystem(tm))
 
 	// --- Foliage Controller ---
 	foliageControllerEntity := world.CreateEntity()
-	foliageController := katsu2d.NewFoliageControllerComponent(
+	foliageController, _ := lazyecs.AddComponent[katsu2d.FoliageControllerComponent](world, foliageControllerEntity)
+	foliageController.Init(
 		katsu2d.WithFoliageWindForce(200), // Radians
 		katsu2d.WithFoliageWindSpeed(3.95),
 		katsu2d.WithFoliageRippleStrength(50),
 	)
-	world.AddComponent(foliageControllerEntity, foliageController)
 
 	createFoliage(world, tm, foliageTextureID, 40, 120, ebimath.V(0.5, 1.0))
-
-	// --- Foliage Entities ---
-	/* for i := 0; i < 10; i++ {
-		createFoliage(world, tm, foliageTextureID, float64(i*60), 120, ebimath.V(0.5, 1.0))
-	}
-	for i := 0; i < 10; i++ {
-		createFoliage(world, tm, foliageTextureID, float64(i*60), 140, ebimath.V(0.5, 1.0))
-	}
-	for i := 0; i < 10; i++ {
-		createFoliage(world, tm, foliageTextureID, float64(i*60), 160, ebimath.V(0.5, 1.0))
-	}
-	for i := 0; i < 10; i++ {
-		createFoliage(world, tm, foliageTextureID, float64(i*60), 180, ebimath.V(0.5, 1.0))
-	}
-	for i := 0; i < 10; i++ {
-		createFoliage(world, tm, foliageTextureID, float64(i*60), 200, ebimath.V(0.5, 1.0))
-	}
-	for i := 0; i < 10; i++ {
-		createFoliage(world, tm, foliageTextureID, float64(i*60), 220, ebimath.V(0.5, 1.0))
-	} */
 
 	return g
 }
 
-func createFoliage(world *katsu2d.World, tm *katsu2d.TextureManager, textureID int, x, y float64, pivot ebimath.Vector) {
+func createFoliage(world *lazyecs.World, tm *katsu2d.TextureManager, textureID int, x, y float64, pivot ebimath.Vector) {
 	entity := world.CreateEntity()
 
 	// Transform
-	transform := katsu2d.NewTransformComponent()
+	transform, _ := lazyecs.AddComponent[katsu2d.TransformComponent](world, entity)
+	transform.Init()
 	transform.SetPosition(ebimath.V(x, y))
-	world.AddComponent(entity, transform)
 
 	// Sprite with a grid mesh
 	img := tm.Get(textureID)
-	sprite := katsu2d.NewSpriteComponent(textureID, img.Bounds())
+	sprite, _ := lazyecs.AddComponent[katsu2d.SpriteComponent](world, entity)
+	sprite.Init(textureID, img.Bounds())
 	sprite.DstW = 512
 	sprite.DstH = 512
-	sprite.SetGrid(5, 5) // 1 column, 10 rows
-	world.AddComponent(entity, sprite)
+	sprite.SetGrid(5, 5)
 
 	// Foliage
-	foliage := &katsu2d.FoliageComponent{
-		TextureID: textureID,
-		SwaySeed:  rand.FloatRange(0, 100),
-		Pivot:     pivot,
-	}
-	world.AddComponent(entity, foliage)
+	foliage, _ := lazyecs.AddComponent[katsu2d.FoliageComponent](world, entity)
+	foliage.TextureID = textureID
+	foliage.SwaySeed = rand.FloatRange(0, 100)
+	foliage.Pivot = pivot
 }
 
 func main() {

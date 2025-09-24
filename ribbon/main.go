@@ -7,6 +7,7 @@ import (
 	ebimath "github.com/edwinsyarief/ebi-math"
 	"github.com/edwinsyarief/katsu2d"
 	"github.com/edwinsyarief/katsu2d/line"
+	"github.com/edwinsyarief/lazyecs"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -17,7 +18,7 @@ type RibbonSystem struct {
 	isDebug bool
 }
 
-func (self *RibbonSystem) Update(world *katsu2d.World, dt float64) {
+func (self *RibbonSystem) Update(world *lazyecs.World, dt float64) {
 	x, y := ebiten.CursorPosition()
 	self.ribbon.AddPoint(ebimath.V(float64(x), float64(y)))
 	self.ribbon.Update(dt)
@@ -28,7 +29,7 @@ func (self *RibbonSystem) Update(world *katsu2d.World, dt float64) {
 	}
 }
 
-func (self *RibbonSystem) Draw(world *katsu2d.World, renderer *katsu2d.BatchRenderer) {
+func (self *RibbonSystem) Draw(world *lazyecs.World, renderer *katsu2d.BatchRenderer) {
 	screen := renderer.GetScreen()
 	topts := &ebiten.DrawTrianglesOptions{}
 	topts.Blend.BlendOperationRGB = ebiten.BlendOperationMax

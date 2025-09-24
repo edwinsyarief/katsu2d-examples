@@ -8,6 +8,7 @@ import (
 
 	ebimath "github.com/edwinsyarief/ebi-math"
 	"github.com/edwinsyarief/katsu2d"
+	"github.com/edwinsyarief/lazyecs"
 	"github.com/hajimehoshi/ebiten/v2"
 	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
 	"github.com/hajimehoshi/ebiten/v2/inpututil"
@@ -17,14 +18,14 @@ type GrassSystem struct {
 	debugImg *ebiten.Image
 }
 
-func (self *GrassSystem) Update(world *katsu2d.World, dt float64) {
-	entities := world.Query(katsu2d.CTGrassController)
-	if len(entities) == 0 {
-		return
+func (self *GrassSystem) Update(world *lazyecs.World, dt float64) {
+	query := world.Query(katsu2d.CTGrassController)
+	var grassCtrl *katsu2d.GrassControllerComponent
+	for query.Next() {
+		for _, entity := range query.Entities() {
+			grassCtrl, _ = lazyecs.GetComponent[katsu2d.GrassControllerComponent](world, entity)
+		}
 	}
-
-	grassCtrlAny, _ := world.GetComponent(entities[0], katsu2d.CTGrassController)
-	grassCtrl := grassCtrlAny.(*katsu2d.GrassControllerComponent)
 
 	if inpututil.IsKeyJustPressed(ebiten.KeySpace) {
 		grassCtrl.AddStrongWindGust(katsu2d.StrongWindGust{
@@ -47,11 +48,15 @@ func (self *GrassSystem) Update(world *katsu2d.World, dt float64) {
 	})
 }
 
-func (self *GrassSystem) Draw(world *katsu2d.World, renderer *katsu2d.BatchRenderer) {
+func (self *GrassSystem) Draw(world *lazyecs.World, renderer *katsu2d.BatchRenderer) {
 	screen := renderer.GetScreen()
 	renderer.Flush()
 
-	bladeAmount := len(world.Query(katsu2d.CTSprite))
+	bladeAmount := 0
+	query := world.Query(katsu2d.CTGrass)
+	for query.Next() {
+		bladeAmount += query.Count()
+	}
 
 	if self.debugImg == nil {
 		self.debugImg = ebiten.NewImage(320, 180)
@@ -90,8 +95,11 @@ func NewGame() *Game {
 	texId := tm.Add(grass) // ID 1: "grass"
 
 	// grass controller
-	transform := katsu2d.NewTransformComponent()
-	grassController := katsu2d.NewGrassControllerComponent(world, tm,
+	entity := world.CreateEntity()
+	transform, _ := lazyecs.AddComponent[katsu2d.TransformComponent](world, entity)
+	transform.Init()
+	grassController, _ := lazyecs.AddComponent[katsu2d.GrassControllerComponent](world, entity)
+	grassController.Init(world, tm,
 		640, 480, texId, transform.Z,
 		katsu2d.WithGrassOrderable(true),
 		katsu2d.WithGrassDensity(10),
@@ -102,11 +110,9 @@ func NewGame() *Game {
 			{X1: 0, Y1: 0, X2: 20, Y2: 20},
 		}),
 	)
-	entity := world.CreateEntity()
-	world.AddComponent(entity, grassController)
 
-	ls := katsu2d.NewLayerSystem(world, 640, 480,
-		katsu2d.AddSystem(katsu2d.NewOrderableSystem(world, tm)),
+	ls := katsu2d.NewLayerSystem( 640, 480,
+		katsu2d.AddSystem(katsu2d.NewOrderableSystem(tm)),
 	)
 
 	g.engine.AddBackgroundDrawSystem(ls)
