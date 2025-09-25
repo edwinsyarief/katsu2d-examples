@@ -27,26 +27,13 @@ func NewGame() *Game {
 
 	world := g.engine.World()
 
-	entity := world.CreateEntity()
-	lazyecs.AddComponent[katsu2d.TransformComponent](world, entity)
-	lazyecs.AddComponent[katsu2d.ShapeComponent](world, entity)
+	entities := world.CreateEntities(4)
 
-	entity2 := world.CreateEntity()
-	lazyecs.AddComponent[katsu2d.TransformComponent](world, entity2)
-	lazyecs.AddComponent[katsu2d.ShapeComponent](world, entity2)
-
-	entity3 := world.CreateEntity()
-	lazyecs.AddComponent[katsu2d.TransformComponent](world, entity3)
-	lazyecs.AddComponent[katsu2d.ShapeComponent](world, entity3)
-
-	entity4 := world.CreateEntity()
-	lazyecs.AddComponent[katsu2d.TransformComponent](world, entity4)
-	lazyecs.AddComponent[katsu2d.ShapeComponent](world, entity4)
-
-	t, _ := lazyecs.GetComponent[katsu2d.TransformComponent](world, entity)
-	t.Init()
+	// Shape 1
+	t := katsu2d.NewTransformComponent()
 	t.SetPosition(ebimath.V(150, 150))
 	t.SetOffset(ebimath.V2(100))
+	lazyecs.SetComponent(world, entities[0], *t)
 
 	rect := katsu2d.NewRectangleShape(200, 200, color.RGBA{255, 255, 0, 255})
 	rect.SetCornerRadius(20, 0, 0, 20)
@@ -63,12 +50,12 @@ func NewGame() *Game {
 		color.RGBA{255, 0, 0, 255},
 		color.RGBA{255, 0, 0, 255},
 	)
-	shape, _ := lazyecs.GetComponent[katsu2d.ShapeComponent](world, entity)
-	shape.Init(rect)
+	shape := katsu2d.NewShapeComponent(rect)
+	lazyecs.SetComponent(world, entities[0], *shape)
 
-	t2, _ := lazyecs.GetComponent[katsu2d.TransformComponent](world, entity2)
-	t2.Init()
+	t2 := katsu2d.NewTransformComponent()
 	t2.SetPosition(ebimath.V(300, 300))
+	lazyecs.SetComponent(world, entities[1], *t2)
 
 	circle := katsu2d.NewCircleShape(50, color.RGBA{255, 255, 0, 255})
 	circle.SetStroke(20, color.RGBA{255, 0, 0, 255})
@@ -84,12 +71,12 @@ func NewGame() *Game {
 		color.RGBA{255, 0, 0, 255},
 		color.RGBA{255, 0, 0, 255},
 	)
-	shape2, _ := lazyecs.GetComponent[katsu2d.ShapeComponent](world, entity2)
-	shape2.Init(circle)
+	shape2 := katsu2d.NewShapeComponent(circle)
+	lazyecs.SetComponent(world, entities[1], *shape2)
 
-	t3, _ := lazyecs.GetComponent[katsu2d.TransformComponent](world, entity3)
-	t3.Init()
+	t3 := katsu2d.NewTransformComponent()
 	t3.SetPosition(ebimath.V(500, 50))
+	lazyecs.SetComponent(world, entities[2], *t3)
 
 	hexagon := katsu2d.NewHexagonShape(100, color.RGBA{255, 255, 0, 255})
 	hexagon.SetCornerRadius(10)
@@ -106,12 +93,12 @@ func NewGame() *Game {
 		color.RGBA{255, 255, 0, 255},
 		color.RGBA{255, 0, 0, 255},
 	)
-	shape3, _ := lazyecs.GetComponent[katsu2d.ShapeComponent](world, entity3)
-	shape3.Init(hexagon)
+	shape3 := katsu2d.NewShapeComponent(hexagon)
+	lazyecs.SetComponent(world, entities[2], *shape3)
 
-	t4, _ := lazyecs.GetComponent[katsu2d.TransformComponent](world, entity4)
-	t4.Init()
+	t4 := katsu2d.NewTransformComponent()
 	t4.SetPosition(ebimath.V(550, 400))
+	lazyecs.SetComponent(world, entities[3], *t4)
 
 	triangle := katsu2d.NewTriangleShape(100, 100, color.RGBA{255, 255, 0, 255})
 	triangle.SetCornerRadius(10)
@@ -126,8 +113,8 @@ func NewGame() *Game {
 		color.RGBA{255, 0, 0, 255},
 		color.RGBA{255, 255, 0, 255},
 	)
-	shape4, _ := lazyecs.GetComponent[katsu2d.ShapeComponent](world, entity4)
-	shape4.Init(triangle)
+	shape4 := katsu2d.NewShapeComponent(triangle)
+	lazyecs.SetComponent(world, entities[3], *shape4)
 
 	g.engine.AddOverlayDrawSystem(katsu2d.NewShapeRenderSystem())
 

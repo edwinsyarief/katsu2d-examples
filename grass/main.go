@@ -96,10 +96,8 @@ func NewGame() *Game {
 
 	// grass controller
 	entity := world.CreateEntity()
-	transform, _ := lazyecs.AddComponent[katsu2d.TransformComponent](world, entity)
-	transform.Init()
-	grassController, _ := lazyecs.AddComponent[katsu2d.GrassControllerComponent](world, entity)
-	grassController.Init(world, tm,
+	transform := katsu2d.NewTransformComponent()
+	grassController := katsu2d.NewGrassControllerComponent(world, tm,
 		640, 480, texId, transform.Z,
 		katsu2d.WithGrassOrderable(true),
 		katsu2d.WithGrassDensity(10),
@@ -110,8 +108,10 @@ func NewGame() *Game {
 			{X1: 0, Y1: 0, X2: 20, Y2: 20},
 		}),
 	)
+	lazyecs.SetComponent(world, entity, *transform)
+	lazyecs.SetComponent(world, entity, *grassController)
 
-	ls := katsu2d.NewLayerSystem( 640, 480,
+	ls := katsu2d.NewLayerSystem(640, 480,
 		katsu2d.AddSystem(katsu2d.NewOrderableSystem(tm)),
 	)
 

@@ -67,12 +67,11 @@ func (self *MainSystem) Update(world *lazyecs.World, dt float64) {
 				lazyecs.RemoveComponent[katsu2d.ParticleEmitterComponent](world, entity)
 
 				transform, _ := lazyecs.GetComponent[katsu2d.TransformComponent](world, entity)
-				newPreset, _ := lazyecs.AddComponent[katsu2d.ParticleEmitterComponent](world, entity)
+				var newPreset *katsu2d.ParticleEmitterComponent
 
 				switch self.selectedParticle {
 				case 1:
-					newPreset.RainPreset(rainTextId)
-
+					newPreset = katsu2d.RainPreset(rainTextId)
 					newPreset.MaxParticles = 5000
 					newPreset.EmitRate = 2000
 					newPreset.InitialColorMin = color.RGBA{255, 255, 255, 255}
@@ -88,13 +87,13 @@ func (self *MainSystem) Update(world *lazyecs.World, dt float64) {
 					newPreset.ParticleSpawnOffset = ebimath.V(320, 0)
 					transform.SetPosition(ebimath.V(0, -50))
 				case 2:
-					newPreset.WhimsicalPreset(0)
+					newPreset = katsu2d.WhimsicalPreset(0)
 					newPreset.MinScale = 5
 					newPreset.MaxScale = 10
 					transform.SetPosition(ebimath.V(320/2, 180/2))
 				default:
 					// --- Particle Emitter Setup ---
-					newPreset.FirePreset(0)
+					newPreset = katsu2d.FirePreset(0)
 					newPreset.MinScale = 10
 					newPreset.MaxScale = 10.5
 					newPreset.ParticleSpawnOffset = ebimath.V2(20)
@@ -102,6 +101,8 @@ func (self *MainSystem) Update(world *lazyecs.World, dt float64) {
 					newPreset.Gravity = ebimath.V(0, -150)
 					transform.SetPosition(ebimath.V(320/2, 180/2))
 				}
+
+				lazyecs.SetComponent(world, entity, *newPreset)
 			}
 		}
 	}
@@ -133,19 +134,19 @@ func NewGame() *Game {
 
 	// --- Player Entity Setup ---
 	playerEntity := world.CreateEntity()
-	playerTransform, _ := lazyecs.AddComponent[katsu2d.TransformComponent](world, playerEntity)
-	playerTransform.Init()
+	playerTransform := katsu2d.NewTransformComponent()
 	// Start the emitter at the bottom-center of the screen
 	playerTransform.SetPosition(ebimath.V(WindowWidth/4, WindowHeight/4))
+	lazyecs.SetComponent(world, playerEntity, *playerTransform)
 
 	// --- Particle Emitter Setup ---
-	firePreset, _ := lazyecs.AddComponent[katsu2d.ParticleEmitterComponent](world, playerEntity)
-	firePreset.FirePreset(0)
+	firePreset := katsu2d.FirePreset(0)
 	firePreset.MinScale = 10
 	firePreset.MaxScale = 10.5
 	firePreset.ParticleSpawnOffset = ebimath.V2(20)
 	firePreset.ScaleMode = katsu2d.ParticleScaleModeScaleInOut
 	firePreset.Gravity = ebimath.V(0, -150)
+	lazyecs.SetComponent(world, playerEntity, *firePreset)
 
 	renderer := katsu2d.NewLayerSystem(
 		WindowWidth/2, WindowHeight/2,

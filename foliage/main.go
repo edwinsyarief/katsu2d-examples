@@ -42,12 +42,12 @@ func NewGame() *Game {
 
 	// --- Foliage Controller ---
 	foliageControllerEntity := world.CreateEntity()
-	foliageController, _ := lazyecs.AddComponent[katsu2d.FoliageControllerComponent](world, foliageControllerEntity)
-	foliageController.Init(
+	foliageController := katsu2d.NewFoliageControllerComponent(
 		katsu2d.WithFoliageWindForce(200), // Radians
 		katsu2d.WithFoliageWindSpeed(3.95),
 		katsu2d.WithFoliageRippleStrength(50),
 	)
+	lazyecs.SetComponent(world, foliageControllerEntity, *foliageController)
 
 	createFoliage(world, tm, foliageTextureID, 40, 120, ebimath.V(0.5, 1.0))
 
@@ -58,23 +58,24 @@ func createFoliage(world *lazyecs.World, tm *katsu2d.TextureManager, textureID i
 	entity := world.CreateEntity()
 
 	// Transform
-	transform, _ := lazyecs.AddComponent[katsu2d.TransformComponent](world, entity)
-	transform.Init()
+	transform := katsu2d.NewTransformComponent()
 	transform.SetPosition(ebimath.V(x, y))
+	lazyecs.SetComponent(world, entity, *transform)
 
 	// Sprite with a grid mesh
 	img := tm.Get(textureID)
-	sprite, _ := lazyecs.AddComponent[katsu2d.SpriteComponent](world, entity)
-	sprite.Init(textureID, img.Bounds())
+	sprite := katsu2d.NewSpriteComponent(textureID, img.Bounds())
 	sprite.DstW = 512
 	sprite.DstH = 512
 	sprite.SetGrid(5, 5)
+	lazyecs.SetComponent(world, entity, *sprite)
 
 	// Foliage
-	foliage, _ := lazyecs.AddComponent[katsu2d.FoliageComponent](world, entity)
+	foliage := katsu2d.FoliageComponent{}
 	foliage.TextureID = textureID
 	foliage.SwaySeed = rand.FloatRange(0, 100)
 	foliage.Pivot = pivot
+	lazyecs.SetComponent(world, entity, foliage)
 }
 
 func main() {

@@ -97,21 +97,19 @@ func NewGame() *Game {
 
 	// --- Player Setup ---
 	playerEntity := world.CreateEntity()
-	playerTransform, _ := lazyecs.AddComponent[katsu2d.TransformComponent](world, playerEntity)
-	playerTransform.Init()
+	playerTransform := katsu2d.NewTransformComponent()
 	playerTransform.SetPosition(ebimath.V(80, 60))
 	playerTransform.Z = 1 // Set player's Z to the same layer as the upper grid tiles
+	lazyecs.SetComponent(world, playerEntity, *playerTransform)
 
-	playerSprite, _ := lazyecs.AddComponent[katsu2d.SpriteComponent](world, playerEntity)
-	playerSprite.Init(
-		playerTexID, playerImg.Bounds(),
-	)
+	playerSprite := katsu2d.NewSpriteComponent(playerTexID, playerImg.Bounds())
+	lazyecs.SetComponent(world, playerEntity, *playerSprite)
 
-	playerTag, _ := lazyecs.AddComponent[katsu2d.TagComponent](world, playerEntity)
-	playerTag.Init(PlayerTag)
+	playerTag := katsu2d.NewTagComponent(PlayerTag)
+	lazyecs.SetComponent(world, playerEntity, *playerTag)
 
-	playerInput, _ := lazyecs.AddComponent[katsu2d.InputComponent](world, playerEntity)
-	playerInput.Init(keybindings)
+	playerInput := katsu2d.NewInputComponent(keybindings)
+	lazyecs.SetComponent(world, playerEntity, *playerInput)
 
 	// --- System Setup ---
 	// The order of these systems is important for this rendering technique.

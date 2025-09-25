@@ -85,8 +85,8 @@ func NewGame() *Game {
 	// --- Entity Setup ---
 	// Create an entity that will handle input
 	inputEntity := world.CreateEntity()
-	inputComponent, _ := lazyecs.AddComponent[katsu2d.InputComponent](world, inputEntity)
-	inputComponent.Init(keybindings)
+	inputComponent := katsu2d.NewInputComponent(keybindings)
+	lazyecs.SetComponent(world, inputEntity, *inputComponent)
 
 	// --- System Setup ---
 	g.engine.AddUpdateSystem(&AudioSystem{
